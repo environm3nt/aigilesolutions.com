@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Kurrent | Interactive Demo</title>
+<meta name="description" content="Interactive demo of Kurrent, a white-label prospecting intelligence portal for staffing agencies. Sample data, nothing to sign up for.">
+<meta name="robots" content="noindex">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preload" href="/fonts/geist.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/geist-mono.woff2" as="font" type="font/woff2" crossorigin>
+<style>
+@font-face{font-family:'Geist';font-style:normal;font-weight:100 900;font-display:swap;src:url(/fonts/geist.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:'Geist Mono';font-style:normal;font-weight:100 900;font-display:swap;src:url(/fonts/geist-mono.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+</style>
+<style>
+:root{
+  color-scheme:light;
+  --bg:#F3F5F7; --surface:#FFFFFF; --surface-2:#F8F9FB;
+  --ink:#0F1219; --ink-2:#4B5261; --ink-3:#7C8494; --ink-4:#A6ADBA;
+  --line:#E3E6EB; --line-2:#CFD4DC;
+  --navy:#0D1626; --navy-2:#13203A;
+  --accent:#0B7A75; --accent-2:#0E9A93; --accent-soft:#E3F3F1;
+  --hot:#C2410C; --hot-soft:#FDEBE3; --warm:#B7791F; --warm-soft:#FBF1DC; --new:#0B7A75; --new-soft:#E3F3F1;
+  --good:#1F8A5B; --bad:#C63B3B;
+  --sans:'Geist',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --mono:'Geist Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+  --r:12px; --r-s:8px; --side:232px; --banner:32px; --tab:64px;
+  --shadow:0 1px 2px rgba(15,18,25,.04),0 8px 24px -16px rgba(15,18,25,.18);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{font-family:var(--sans);background:var(--bg);color:var(--ink);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased;min-height:100vh;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+button,input,select,textarea{font-family:inherit;font-size:inherit;color:inherit}
+button{cursor:pointer;background:none;border:none}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
+.mono{font-family:var(--mono)}
+.num{font-variant-numeric:tabular-nums}
+svg.i{width:16px;height:16px;flex:none;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+
+/* banner */
+.banner{position:fixed;top:0;left:0;right:0;height:var(--banner);z-index:400;display:flex;align-items:center;justify-content:center;gap:8px;background:var(--navy);color:#C9D1DE;font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;overflow:hidden;padding:0 12px;padding-top:env(safe-area-inset-top,0px);box-sizing:content-box}
+.banner a{color:#fff;text-decoration:underline;text-underline-offset:3px}
+.banner .b-short{display:none}
+
+/* shell */
+.shell{display:flex;min-height:100vh;padding-top:calc(var(--banner) + env(safe-area-inset-top,0px))}
+.side{width:var(--side);position:fixed;top:calc(var(--banner) + env(safe-area-inset-top,0px));bottom:0;left:0;background:var(--navy);color:#C9D1DE;display:flex;flex-direction:column;z-index:100;overflow:hidden}
+.side::before{content:"";position:absolute;inset:0 0 auto 0;height:220px;background:
+  radial-gradient(420px 220px at 10% -20%, rgba(14,154,147,.45), transparent 70%),
+  radial-gradient(360px 200px at 110% 10%, rgba(183,121,31,.35), transparent 70%);pointer-events:none}
+.brand{position:relative;display:flex;align-items:center;gap:10px;padding:22px 18px 18px;border-bottom:1px solid rgba(255,255,255,.08)}
+.brand .mark{width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,#12B5AD,#0B7A75);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:15px;box-shadow:0 8px 20px -8px #0E9A93}
+.brand b{display:block;color:#fff;font-weight:600;font-size:15px;letter-spacing:-.01em}
+.brand span{display:block;font-size:11.5px;color:#8B95A8}
+.nav{position:relative;padding:12px 10px;display:flex;flex-direction:column;gap:2px}
+.nav .lbl{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#6E7890;padding:12px 10px 6px}
+.nav button{display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:9px 10px;border-radius:9px;color:#B6BFCF;font-size:13.5px;font-weight:500;transition:background .15s,color .15s}
+.nav button:hover{background:rgba(255,255,255,.06);color:#fff}
+.nav button.on{background:rgba(255,255,255,.1);color:#fff}
+.nav button .cnt{margin-left:auto;font-family:var(--mono);font-size:10.5px;color:#8B95A8;background:rgba(255,255,255,.06);padding:1px 7px;border-radius:999px}
+.side .foot{margin-top:auto;padding:14px 18px;border-top:1px solid rgba(255,255,255,.08);font-size:12px;color:#8B95A8;display:flex;align-items:center;gap:10px}
+.side .foot .av{width:28px;height:28px;border-radius:50%;background:#1E2C47;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600}
+.side .foot b{display:block;color:#E6EAF0;font-weight:500;font-size:12.5px}
+
+.main{margin-left:var(--side);flex:1;min-width:0;padding:26px clamp(16px,3vw,36px) 48px}
+.page{display:none;max-width:1120px}
+.page.on{display:block}
+.head{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px 16px;margin-bottom:20px}
+.head h1{font-size:24px;font-weight:600;letter-spacing:-.025em;line-height:1.2}
+.head p{color:var(--ink-2);font-size:13.5px;margin-top:3px}
+.head .tools{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+
+/* controls */
+.seg{display:inline-flex;max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;background:var(--surface);border:1px solid var(--line);border-radius:9px;padding:3px;gap:2px}
+.seg button{white-space:nowrap;padding:6px 11px;border-radius:6px;font-size:12.5px;color:var(--ink-2);font-weight:500}
+.seg button.on{background:var(--ink);color:#fff}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:9px 14px;border-radius:9px;font-size:13px;font-weight:500;border:1px solid var(--line-2);background:var(--surface);color:var(--ink);transition:background .15s,border-color .15s;white-space:nowrap}
+.btn:hover{border-color:var(--ink-3)}
+.btn.primary{background:var(--ink);color:#fff;border-color:var(--ink)}
+.btn.primary:hover{background:var(--accent);border-color:var(--accent)}
+.btn.accent{background:var(--accent);color:#fff;border-color:var(--accent)}
+.btn.ghost{border-color:transparent;background:transparent;color:var(--ink-2)}
+.btn.ghost:hover{background:var(--surface-2);border-color:transparent;color:var(--ink)}
+.btn.sm{padding:6px 10px;font-size:12px}
+.input,.select,textarea.input{width:100%;background:var(--surface);border:1px solid var(--line-2);border-radius:9px;padding:9px 12px;font-size:13.5px;transition:border-color .15s}
+.input:focus,.select:focus,textarea.input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.select{appearance:none;-webkit-appearance:none;padding-right:30px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%234B5261' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center}
+.search{position:relative;min-width:220px}
+.search .i{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--ink-3)}
+.search .input{padding-left:32px}
+label.f{display:block;font-size:12px;font-weight:500;color:var(--ink-2);margin-bottom:6px}
+
+/* cards & grids */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}
+.card .hd{padding:16px 18px 0;display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.card .hd h3{font-size:14.5px;font-weight:600;letter-spacing:-.005em}
+.card .hd p{font-size:12.5px;color:var(--ink-3);margin-top:2px}
+.card .bd{padding:14px 18px 18px}
+.grid{display:grid;gap:14px}
+.g4{grid-template-columns:repeat(4,1fr)}.g3{grid-template-columns:repeat(3,1fr)}.g2{grid-template-columns:1fr 1fr}
+.stat{padding:16px 18px}
+.stat .l{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
+.stat .v{font-size:28px;font-weight:600;letter-spacing:-.03em;line-height:1.1;margin:8px 0 4px}
+.stat .d{font-size:12px;color:var(--ink-3)}
+.stat .d.up{color:var(--good)}
+.stack{display:flex;flex-direction:column;gap:14px}
+
+/* pills */
+.pill{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:6px;font-weight:500;white-space:nowrap}
+.pill.hot{background:var(--hot-soft);color:var(--hot)}.pill.warm{background:var(--warm-soft);color:var(--warm)}.pill.new{background:var(--new-soft);color:var(--new)}
+.pill.grey{background:var(--surface-2);color:var(--ink-2);border:1px solid var(--line)}
+.dot{width:7px;height:7px;border-radius:50%;display:inline-block;flex:none}
+.c-verified{background:var(--good)}.c-partial{background:var(--warm)}.c-none{background:var(--ink-4)}
+
+/* lists */
+.row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-top:1px solid var(--line)}
+.row:first-child{border-top:none}
+.row .t{font-weight:500;font-size:13.5px}
+.row .s{font-size:12.5px;color:var(--ink-3);margin-top:2px}
+
+/* table & lead cards */
+.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th{text-align:left;font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);font-weight:500;padding:10px 12px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:12px;border-bottom:1px solid var(--line);vertical-align:middle}
+tr.lead{cursor:pointer;transition:background .12s}
+tr.lead:hover{background:var(--surface-2)}
+tr.lead.sel{background:var(--accent-soft)}
+td .co{font-weight:600}
+td .ro{font-size:12.5px;color:var(--ink-2)}
+.leadcards{display:none;flex-direction:column;gap:10px}
+.leadcard{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px;box-shadow:var(--shadow);cursor:pointer}
+.leadcard .top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.leadcard .co{font-weight:600;font-size:14.5px}
+.leadcard .ro{font-size:13px;color:var(--ink-2);margin-top:2px}
+.leadcard .meta{display:flex;flex-wrap:wrap;gap:6px 12px;font-size:12px;color:var(--ink-3);margin-top:10px;align-items:center}
+.leadcard .fee{font-weight:600;color:var(--ink)}
+
+/* drawer */
+.scrim{position:fixed;inset:0;background:rgba(13,22,38,.35);z-index:250;opacity:0;pointer-events:none;transition:opacity .25s}
+.scrim.on{opacity:1;pointer-events:auto}
+.drawer{position:fixed;top:calc(var(--banner) + env(safe-area-inset-top,0px));right:0;bottom:0;width:min(520px,100vw);background:var(--surface);border-left:1px solid var(--line);z-index:300;transform:translateX(100%);transition:transform .3s cubic-bezier(.2,.7,.2,1);overflow-y:auto;box-shadow:-24px 0 60px -30px rgba(13,22,38,.4);padding-bottom:calc(24px + env(safe-area-inset-bottom,0px))}
+.drawer.on{transform:none}
+.drawer .dh{position:sticky;top:0;background:var(--surface);border-bottom:1px solid var(--line);padding:16px 20px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;z-index:2}
+.drawer .dh h2{font-size:17px;font-weight:600;letter-spacing:-.02em;line-height:1.25}
+.drawer .dh p{font-size:13px;color:var(--ink-2);margin-top:2px}
+.drawer .x{width:32px;height:32px;border-radius:8px;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;flex:none;background:var(--surface)}
+.drawer .db{padding:18px 20px}
+.facts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.fact{background:var(--surface-2);border:1px solid var(--line);border-radius:var(--r-s);padding:9px 11px}
+.fact .l{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
+.fact .v{font-size:13.5px;font-weight:500;margin-top:3px}
+.sec{margin-top:20px}
+.sec h4{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
+.insight{background:linear-gradient(135deg,var(--accent-soft),#F1F8F7);border:1px solid #CFE6E3;border-radius:var(--r);padding:12px 14px;font-size:13.5px;color:var(--ink)}
+.insight .l{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:5px;display:flex;align-items:center;gap:6px}
+.cand{display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--line)}
+.cand:first-of-type{border-top:none}
+.cand .rk{width:26px;height:26px;border-radius:50%;background:var(--surface-2);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:11px;color:var(--ink-2);flex:none}
+.cand .n{font-weight:500;font-size:13.5px}
+.cand .h{font-size:12px;color:var(--ink-3)}
+.cand .sc{margin-left:auto;text-align:right;flex:none}
+.cand .sc b{display:block;font-size:13px;font-weight:600}
+.cand .sc span{font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3)}
+.note{display:flex;gap:10px;padding:10px 0;border-top:1px solid var(--line)}
+.note:first-of-type{border-top:none}
+.note .av{width:26px;height:26px;border-radius:50%;background:var(--navy);color:#fff;font-size:11px;display:flex;align-items:center;justify-content:center;flex:none;font-weight:600}
+.note .w{font-size:12px;color:var(--ink-3)}
+.note .m{font-size:13.5px;margin-top:2px}
+.noteform{display:flex;gap:8px;margin-top:10px}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:20px}
+.actions .btn.wide{grid-column:1/-1}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:10px 16px;border-radius:10px;font-size:13px;z-index:500;opacity:0;transition:opacity .2s,transform .2s;box-shadow:0 12px 30px -10px rgba(0,0,0,.5);pointer-events:none;max-width:calc(100vw - 32px);text-align:center}
+.toast.on{opacity:1;transform:translateX(-50%)}
+
+/* roles */
+.role{border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;background:var(--surface-2)}
+.role .rh{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px}
+.role .rh b{font-size:14px;font-weight:600}
+.role .rr{display:grid;grid-template-columns:90px 1fr;gap:8px;align-items:center;font-size:12.5px;color:var(--ink-3);padding:5px 0}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{padding:4px 10px;border-radius:999px;border:1px solid var(--line-2);background:var(--surface);font-size:12px;color:var(--ink-2)}
+.chip.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.chip.loc{padding-right:6px;display:inline-flex;align-items:center;gap:6px}
+.chip.loc i{font-style:normal;color:var(--ink-3)}
+.plan{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.day{border:1px solid var(--line);border-radius:var(--r-s);background:var(--surface-2);padding:10px;min-height:140px;display:flex;flex-direction:column;gap:6px}
+.day .dn{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
+.day button.r{text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:7px;padding:6px 9px;font-size:12.5px;font-weight:500;display:flex;justify-content:space-between;gap:6px}
+.day button.r span{color:var(--ink-4)}
+.day select{margin-top:auto;font-size:12px;border:1px dashed var(--line-2);border-radius:7px;padding:5px 8px;background:transparent;color:var(--ink-3)}
+.pool{height:6px;border-radius:3px;background:var(--line);overflow:hidden}
+.pool i{display:block;height:100%;background:var(--accent);border-radius:3px}
+.savebar{position:sticky;bottom:0;background:linear-gradient(180deg,rgba(243,245,247,0),var(--bg) 30%);padding:14px 0 4px;display:flex;justify-content:flex-end;gap:8px;margin-top:8px}
+
+/* intelligence */
+.bench{padding:12px 0;border-top:1px solid var(--line)}
+.bench:first-child{border-top:none}
+.bench .t{display:flex;justify-content:space-between;gap:10px;font-size:13.5px}
+.bench .t b{font-weight:600}
+.bench .t .yoy{font-family:var(--mono);font-size:11px;color:var(--good)}
+.bench .s{font-size:12px;color:var(--ink-3);margin:2px 0 8px}
+.bench .bar{position:relative;height:8px;background:var(--line);border-radius:4px}
+.bench .bar i{position:absolute;top:0;bottom:0;background:var(--accent);border-radius:4px}
+.bench .rng{display:flex;justify-content:space-between;font-family:var(--mono);font-size:10.5px;color:var(--ink-3);margin-top:5px}
+.tabs{display:flex;gap:2px;border-bottom:1px solid var(--line);margin-bottom:16px}
+.tabs button{padding:9px 14px;font-size:13.5px;color:var(--ink-3);border-bottom:2px solid transparent;margin-bottom:-1px;font-weight:500}
+.tabs button.on{color:var(--ink);border-bottom-color:var(--ink)}
+.prog{height:6px;background:var(--line);border-radius:3px;overflow:hidden;margin-top:12px}
+.prog i{display:block;height:100%;width:0;background:var(--accent);transition:width .4s}
+.brief-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}
+.brief-cards div{border:1px solid var(--line);border-radius:var(--r-s);padding:12px;background:var(--surface-2)}
+.brief-cards b{display:block;font-size:13px;font-weight:600;margin-bottom:3px}
+.brief-cards span{font-size:12px;color:var(--ink-3)}
+
+/* analytics */
+.funnel .fr{display:grid;grid-template-columns:110px 1fr 48px;align-items:center;gap:10px;padding:6px 0;font-size:13px}
+.funnel .fr .lbl{color:var(--ink-2)}
+.funnel .fr .bar{height:22px;background:var(--line);border-radius:5px;overflow:hidden}
+.funnel .fr .bar i{display:block;height:100%;background:var(--navy);border-radius:5px;color:#fff;font-family:var(--mono);font-size:11px;display:flex;align-items:center;padding-left:8px;min-width:32px}
+.funnel .fr .pc{font-family:var(--mono);font-size:11.5px;color:var(--ink-3);text-align:right}
+
+/* settings */
+.sw{width:28px;height:28px;border-radius:8px;border:1px solid var(--line-2);display:inline-block;vertical-align:middle;margin-right:8px}
+.member{display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--line)}
+.member:first-child{border-top:none}
+.member .av{width:32px;height:32px;border-radius:50%;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600}
+.member .n{font-weight:500;font-size:13.5px}
+.member .e{font-size:12px;color:var(--ink-3)}
+.member .role{margin-left:auto;padding:3px 9px;font-size:12px;background:var(--surface-2)}
+
+
+/* engine */
+.eng{display:grid;grid-template-columns:1fr 380px;gap:14px;align-items:start}
+.stages{display:flex;flex-direction:column;gap:0;position:relative}
+.stg{display:grid;grid-template-columns:34px 1fr auto;gap:12px;align-items:start;padding:12px 0;border-top:1px solid var(--line);position:relative}
+.stg:first-child{border-top:none}
+.stg .n{width:30px;height:30px;border-radius:50%;border:1.5px solid var(--line-2);background:var(--surface);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:11px;color:var(--ink-3);position:relative;z-index:1;transition:background .2s,border-color .2s,color .2s}
+.stg .t{font-weight:600;font-size:13.5px}
+.stg .d{font-size:12.5px;color:var(--ink-3);margin-top:2px}
+.stg .out{font-family:var(--mono);font-size:11px;color:var(--ink-3);text-align:right;white-space:nowrap;padding-top:6px;min-width:90px}
+.stg.run .n{border-color:var(--accent);color:var(--accent);box-shadow:0 0 0 4px var(--accent-soft)}
+.stg.run .t{color:var(--accent)}
+.stg.done .n{background:var(--ink);border-color:var(--ink);color:#fff}
+.stg.done .out{color:var(--ink)}
+.stg .src{display:inline-block;font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);border:1px solid var(--line);border-radius:5px;padding:1px 6px;margin-left:6px;vertical-align:middle}
+.log{background:var(--navy);color:#C9D1DE;border-radius:var(--r);padding:14px 16px;font-family:var(--mono);font-size:11.5px;line-height:1.7;min-height:260px;max-height:420px;overflow-y:auto;white-space:pre-wrap;word-break:break-word}
+.log .k{color:#7FD8D1}.log .w{color:#E0B45A}.log .g{color:#8B95A8}.log .ok{color:#5CD49A}
+.runbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:14px}
+.runbar .sp{font-size:12.5px;color:var(--ink-3);margin-left:auto;font-family:var(--mono)}
+@media (max-width:1100px){.eng{grid-template-columns:1fr}}
+@media (max-width:820px){.stg{grid-template-columns:30px 1fr}.stg .out{grid-column:2;text-align:left;padding-top:2px;min-width:0}.stg .n{width:26px;height:26px;font-size:10px}}
+
+.kv-stack{display:grid;grid-template-columns:1fr 1fr;gap:6px 12px}
+.kv-stack div{display:flex;flex-direction:column;padding:7px 0;border-bottom:1px solid var(--line)}
+.kv-stack span{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
+.kv-stack b{font-size:13px;font-weight:500;margin-top:1px}
+@media (max-width:480px){.kv-stack{grid-template-columns:1fr}}
+/* mobile tab bar */
+.tabbar{display:none}
+
+@media (max-width:1100px){.g4{grid-template-columns:1fr 1fr}.g3{grid-template-columns:1fr 1fr}.brief-cards{grid-template-columns:1fr 1fr}}
+@media (max-width:820px){
+  .side{display:none}
+  .main{margin-left:0;padding:18px 16px calc(var(--tab) + 24px + env(safe-area-inset-bottom,0px))}
+  .head h1{font-size:21px}
+  .g2,.g3{grid-template-columns:1fr}
+  .tbl-wrap.leads{display:none}
+  .leadcards{display:flex}
+  .tabbar{display:grid;grid-template-columns:repeat(7,1fr);position:fixed;left:0;right:0;bottom:0;height:calc(var(--tab) + env(safe-area-inset-bottom,0px));padding-bottom:env(safe-area-inset-bottom,0px);background:rgba(255,255,255,.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--line);z-index:200}
+  .tabbar button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:9.5px;color:var(--ink-3);font-weight:500}
+  .tabbar button.on{color:var(--ink)}
+  .tabbar button .i{width:20px;height:20px}
+  .banner .b-long{display:none}.banner .b-short{display:inline}
+  .drawer{width:100vw;border-left:none}
+  .facts{grid-template-columns:1fr 1fr}
+  .funnel .fr{grid-template-columns:86px 1fr 40px}
+  .savebar{position:fixed;left:0;right:0;bottom:calc(var(--tab) + env(safe-area-inset-bottom,0px));padding:10px 16px;background:var(--bg);border-top:1px solid var(--line);margin:0;z-index:150}
+}
+@media (max-width:480px){.g4{grid-template-columns:1fr 1fr}.brief-cards{grid-template-columns:1fr 1fr}.head .tools{width:100%}.search{min-width:0;flex:1}}
+@media (prefers-reduced-motion:reduce){*{transition:none !important}}
+</style>
+</head>
+<body>
+
+<div class="banner"><span class="b-long">Interactive demo — Kurrent client portal · sample data · </span><span class="b-short">Demo · </span><a href="/#work"><span class="b-long">Built by Aigile Solutions — back to site</span><span class="b-short">← Back to site</span></a></div>
+
+<div class="shell">
+  <aside class="side">
+    <div class="brand"><span class="mark">K</span><div><b>Kurrent</b><span>Demo Agency · Growth+</span></div></div>
+    <nav class="nav" id="nav">
+      <div class="lbl">Intelligence</div>
+      <button data-p="briefing" onclick="go('briefing')"><svg class="i" viewBox="0 0 24 24"><path d="M3 11l9-7 9 7v9a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1z"/></svg>Today's briefing</button>
+      <button data-p="pipeline" onclick="go('pipeline')"><svg class="i" viewBox="0 0 24 24"><path d="M4 6h16M4 12h10M4 18h6"/></svg>Pipeline<span class="cnt" id="navCount"></span></button>
+      <button data-p="intel" onclick="go('intel')"><svg class="i" viewBox="0 0 24 24"><path d="M3 20h18M6 16V9M11 16V5M16 16v-7M21 16v-4"/></svg>Intelligence</button>
+      <button data-p="engine" onclick="go('engine')"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4M5 5l2.8 2.8M16.2 16.2L19 19M5 19l2.8-2.8M16.2 7.8L19 5"/></svg>Engine</button>
+      <div class="lbl">Configure</div>
+      <button data-p="roles" onclick="go('roles')"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>Roles &amp; digest</button>
+      <button data-p="analytics" onclick="go('analytics')"><svg class="i" viewBox="0 0 24 24"><path d="M4 19V5M4 19h16M8 15l4-5 3 3 5-7"/></svg>Analytics</button>
+      <button data-p="settings" onclick="go('settings')"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 00.3 1.8l.1.1a2 2 0 01-2.8 2.8l-.1-.1a1.7 1.7 0 00-1.8-.3 1.7 1.7 0 00-1 1.5V21a2 2 0 01-4 0v-.1a1.7 1.7 0 00-1.1-1.5 1.7 1.7 0 00-1.8.3l-.1.1a2 2 0 01-2.8-2.8l.1-.1a1.7 1.7 0 00.3-1.8 1.7 1.7 0 00-1.5-1H3a2 2 0 010-4h.1a1.7 1.7 0 001.5-1.1 1.7 1.7 0 00-.3-1.8l-.1-.1a2 2 0 012.8-2.8l.1.1a1.7 1.7 0 001.8.3H9a1.7 1.7 0 001-1.5V3a2 2 0 014 0v.1a1.7 1.7 0 001 1.5 1.7 1.7 0 001.8-.3l.1-.1a2 2 0 012.8 2.8l-.1.1a1.7 1.7 0 00-.3 1.8V9a1.7 1.7 0 001.5 1H21a2 2 0 010 4h-.1a1.7 1.7 0 00-1.5 1z"/></svg>Settings</button>
+    </nav>
+    <div class="foot"><span class="av">DU</span><div><b>Demo User</b>demo@agency.com</div></div>
+  </aside>
+
+  <main class="main">
+
+    <!-- BRIEFING -->
+    <section class="page on" id="p-briefing">
+      <div class="head"><div><h1>Today's briefing</h1><p id="briefDate"></p></div><div class="tools"><button class="btn" onclick="toast('Digest re-sent to demo@agency.com')"><svg class="i" viewBox="0 0 24 24"><path d="M4 6h16v12H4zM4 7l8 6 8-6"/></svg>Email me this</button></div></div>
+      <div class="grid g4" id="briefStats"></div>
+      <div class="grid g2" style="margin-top:14px">
+        <div class="card"><div class="hd"><div><h3>Market highlights</h3><p>What changed in your target markets overnight</p></div></div>
+          <div class="bd" style="font-size:14px;line-height:1.65;color:var(--ink)">Strong hiring activity across your target markets this morning. <b>8 new leads</b> were identified across your configured roles, with notable activity from Northgate Engineering, Halcyon Build and Meridian Infrastructure in engineering and construction. Toronto continues to show elevated demand for senior structural engineers, with 23 competing postings tracked in the GTA. The legal sector remains active with 3 new paralegal postings from downtown firms. Two of today's leads include verified hiring contacts; prioritise outreach to these before end of day.</div>
+        </div>
+        <div class="card"><div class="hd"><div><h3>Priority actions</h3><p>Verified contacts first, then warm signals</p></div></div>
+          <div class="bd" id="priority"></div>
+        </div>
+      </div>
+      <div class="card" style="margin-top:14px"><div class="hd"><div><h3>This week's digests</h3><p>Which roles each morning's briefing will cover, from your schedule</p></div><button class="btn sm ghost" onclick="go('roles')">Edit schedule →</button></div>
+        <div class="bd" id="briefPlan"></div></div>
+    </section>
+
+    <!-- PIPELINE -->
+    <section class="page" id="p-pipeline">
+      <div class="head"><div><h1>Pipeline</h1><p id="pipeSub"></p></div>
+        <div class="tools">
+          <div class="search"><svg class="i" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input class="input" id="q" placeholder="Search company or role" oninput="renderPipeline()"></div>
+          <select class="select" id="fContact" onchange="renderPipeline()"><option value="all">Any contact</option><option value="verified">Verified contact</option><option value="partial">Partial contact</option><option value="none">No contact</option></select>
+        </div>
+      </div>
+      <div class="seg" id="stageSeg" style="margin-bottom:14px;display:flex"></div>
+      <div class="card tbl-wrap leads"><table>
+        <thead><tr><th>Company · role</th><th>Signal</th><th>Contact</th><th>Stage</th><th>Location</th><th style="text-align:right">Est. fee</th><th style="text-align:right">Open</th></tr></thead>
+        <tbody id="tbody"></tbody></table></div>
+      <div class="leadcards" id="leadcards"></div>
+    </section>
+
+    <!-- INTELLIGENCE -->
+    <section class="page" id="p-intel">
+      <div class="head"><div><h1>Intelligence</h1><p>Market monitoring across your target sectors, and the branded briefs you send from it</p></div></div>
+      <div class="tabs"><button class="on" onclick="tab(this,'market')">Market</button><button onclick="tab(this,'briefs')">Industry briefs</button><button onclick="tab(this,'reports')">Lead reports</button></div>
+      <div id="t-market">
+        <div class="grid g4">
+          <div class="card stat"><div class="l">Competing postings</div><div class="v num">23</div><div class="d">Senior structural, GTA</div></div>
+          <div class="card stat"><div class="l">Industries tracked</div><div class="v num">4</div><div class="d">Engineering, construction, legal, tech</div></div>
+          <div class="card stat"><div class="l">Talent pool</div><div class="v num">142</div><div class="d">Matched profiles this month</div></div>
+          <div class="card stat"><div class="l">Avg days to fill</div><div class="v num">38</div><div class="d up">↓ 4 vs last quarter</div></div>
+        </div>
+        <div class="grid g2" style="margin-top:14px">
+          <div class="card"><div class="hd"><div><h3>Salary benchmarks</h3><p>Current ranges for your tracked roles</p></div></div><div class="bd" id="bench"></div></div>
+          <div class="card"><div class="hd"><div><h3>Competitor activity</h3><p>Employers competing for the same talent</p></div></div><div class="bd" id="comp"></div></div>
+        </div>
+      </div>
+      <div id="t-briefs" style="display:none">
+        <div class="card"><div class="hd"><div><h3>Generate an industry brief</h3><p>A client-branded market report for any industry and city. Use it to open a conversation with a prospect; no open role required.</p></div><span class="pill new">Growth+</span></div>
+          <div class="bd">
+            <div class="grid g2" style="gap:12px">
+              <div><label class="f" for="bInd">Industry</label><select class="select" id="bInd"><option>Engineering</option><option>Construction</option><option>Legal</option><option>Technology</option><option>Healthcare</option><option>Finance</option></select></div>
+              <div><label class="f" for="bLoc">Location</label><input class="input" id="bLoc" value="Toronto, ON"></div>
+            </div>
+            <div style="margin-top:12px"><label class="f" for="bCo">Target company</label><input class="input" id="bCo" placeholder="The prospect you're sending this to"></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:14px;flex-wrap:wrap"><span style="font-size:12.5px;color:var(--ink-3)" id="bStatus">Typically generates in 30–60 seconds</span><button class="btn primary" id="bGen" onclick="genBrief()">Generate brief</button></div>
+            <div class="prog" id="bProg" style="display:none"><i></i></div>
+            <div class="brief-cards">
+              <div><b>Competitor hiring</b><span>Active postings from competing employers</span></div>
+              <div><b>Salary benchmarks</b><span>Ranges for the top roles in the sector</span></div>
+              <div><b>Talent scarcity</b><span>Pool size and availability signals</span></div>
+              <div><b>Demand trends</b><span>Which roles are hardest to fill</span></div>
+            </div>
+          </div></div>
+        <div class="card" style="margin-top:14px"><div class="hd"><div><h3>Recent briefs</h3></div></div><div class="bd" style="padding-top:6px"><div class="tbl-wrap"><table><thead><tr><th>Industry</th><th>Company</th><th>Location</th><th>Generated</th><th>Status</th><th></th></tr></thead><tbody id="briefRows">
+          <tr><td>Mining &amp; resources</td><td>Orrin Mining Partners</td><td>Sudbury, ON</td><td>Yesterday</td><td><span class="pill grey">Sent</span></td><td><button class="btn sm">View PDF</button></td></tr>
+          <tr><td>Engineering</td><td>Tessera Design Group</td><td>Toronto, ON</td><td>Sep 24</td><td><span class="pill grey">Sent</span></td><td><button class="btn sm">View PDF</button></td></tr>
+          <tr><td>Healthcare</td><td>Larkspur Health Network</td><td>Ottawa, ON</td><td>Sep 22</td><td><span class="pill grey">Sent</span></td><td><button class="btn sm">View PDF</button></td></tr>
+        </tbody></table></div></div></div>
+      </div>
+      <div id="t-reports" style="display:none">
+        <div class="card"><div class="hd"><div><h3>Lead reports</h3><p>Generated automatically for every HOT lead and on request from the pipeline. Client-branded: hiring signal, decision-makers, competitive framing.</p></div></div>
+          <div class="bd" style="padding-top:6px"><div class="tbl-wrap"><table><thead><tr><th>Lead</th><th>Role</th><th>Generated</th><th>Status</th><th></th></tr></thead><tbody>
+            <tr><td><b>Northgate Engineering</b></td><td>Sr. Structural Engineer</td><td>Today, 07:12</td><td><span class="pill new">Ready</span></td><td><button class="btn sm">View PDF</button></td></tr>
+            <tr><td><b>Bellamy Rowe LLP</b></td><td>Legal Assistant</td><td>Today, 07:12</td><td><span class="pill new">Ready</span></td><td><button class="btn sm">View PDF</button></td></tr>
+            <tr><td><b>Meridian Infrastructure</b></td><td>Civil Engineer</td><td>Yesterday</td><td><span class="pill grey">Sent</span></td><td><button class="btn sm">View PDF</button></td></tr>
+            <tr><td><b>Cascadia Steelworks</b></td><td>Structural Detailer</td><td>Sep 24</td><td><span class="pill grey">Sent</span></td><td><button class="btn sm">View PDF</button></td></tr>
+          </tbody></table></div></div></div>
+      </div>
+    </section>
+
+    <!-- ENGINE -->
+    <section class="page" id="p-engine">
+      <div class="head"><div><h1>The engine</h1><p>What runs every morning before the briefing exists: ten stages from raw job postings to a client-branded digest</p></div></div>
+      <div class="card" style="margin-bottom:14px"><div class="bd" style="padding:14px 18px">
+        <div class="runbar">
+          <select class="select" id="engCo" style="width:auto;min-width:220px"><option>Northgate Engineering</option><option>Bellamy Rowe LLP</option><option>Lumen Commerce</option><option>Halcyon Build Corp.</option></select>
+          <button class="btn primary" id="engRun" onclick="runEngine()">Run a cycle</button>
+          <button class="btn ghost sm" onclick="resetEngine()">Reset</button>
+          <span class="sp" id="engClock">idle</span>
+        </div>
+        <p style="font-size:13px;color:var(--ink-2);max-width:70ch">In production this runs unattended at 05:30 for every configured role–location pair, in parallel. A single company takes about a minute; the whole daily cycle for an agency finishes in under twenty. Watch one company go through it.</p>
+      </div></div>
+      <div class="eng">
+        <div class="card"><div class="hd"><div><h3>Ten stages</h3><p>Each stage is idempotent and re-runnable; a failure in one never loses the work of the others</p></div></div>
+          <div class="bd stages" id="stages"></div></div>
+        <div class="stack">
+          <div class="card"><div class="hd"><div><h3>Run log</h3><p id="logSub">Nothing running</p></div></div><div class="bd"><div class="log" id="log"><span class="g">— press Run a cycle —</span></div></div></div>
+          <div class="card"><div class="hd"><div><h3>Stack</h3><p>Eleven managed services, no servers to run. Built and deployed in two weeks.</p></div></div>
+            <div class="bd" style="padding-top:8px"><div class="kv-stack">
+              <div><span>Portal</span><b>Next.js on Vercel</b></div>
+              <div><span>Pipeline cron</span><b>Railway</b></div>
+              <div><span>Auth + DB</span><b>Supabase</b></div>
+              <div><span>Synthesis</span><b>Claude</b></div>
+              <div><span>Enrichment</span><b>Apollo</b></div>
+              <div><span>Contact data</span><b>People Data Labs</b></div>
+              <div><span>Profiles</span><b>Browserbase</b></div>
+              <div><span>CRM</span><b>Airtable · 39 fields</b></div>
+              <div><span>PDF render</span><b>PDFMonkey</b></div>
+              <div><span>Email</span><b>Resend</b></div>
+              <div><span>Errors · secrets</span><b>Sentry · Doppler</b></div>
+            </div>
+            <p style="font-size:12.5px;color:var(--ink-3);margin-top:12px;line-height:1.55">Two decisions worth knowing: contacts come from People Data Labs first because the fallback source redacts about 70% of names; and reports render on demand only, because every render has a real per-unit cost.</p></div></div>
+          <div class="card"><div class="hd"><div><h3>What it replaces</h3></div></div><div class="bd" style="font-size:13px;color:var(--ink-2);line-height:1.6">A recruiter's morning: searching job boards, guessing which postings are real, looking up the company, hunting for the hiring manager on LinkedIn, checking whether a candidate they know fits, writing an email. Two to three hours a day per recruiter, most of it before the first conversation. The engine does it overnight and the recruiter starts at the conversation.</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ROLES -->
+    <section class="page" id="p-roles">
+      <div class="head"><div><h1>Roles &amp; digest</h1><p>What Kurrent searches for, and which mornings each role lands in your briefing</p></div></div>
+      <div class="card"><div class="hd"><div><h3>Role pool</h3><p>One search per role–location pair. Growth+ includes 12 roles and 3 locations.</p></div><span class="mono" style="font-size:11.5px;color:var(--ink-3)" id="poolTxt"></span></div>
+        <div class="bd"><div class="pool"><i id="poolBar"></i></div>
+          <div class="stack" style="margin-top:16px" id="roleCards"></div>
+          <div style="margin-top:12px"><button class="btn" onclick="addRole()">+ Add a role</button></div>
+        </div></div>
+      <div class="card" style="margin-top:14px"><div class="hd"><div><h3>Digest schedule</h3><p>Each morning's briefing covers only the roles assigned to that day. Click a role to remove it; add from the dropdown.</p></div></div>
+        <div class="bd"><div class="plan" id="planGrid"></div></div></div>
+      <div class="savebar"><button class="btn" onclick="resetPlan()">Discard</button><button class="btn primary" onclick="toast('Saved. Tomorrow\'s digest uses the new schedule.')">Save changes</button></div>
+    </section>
+
+    <!-- ANALYTICS -->
+    <section class="page" id="p-analytics">
+      <div class="head"><div><h1>Analytics</h1><p>Pipeline performance and the money behind it</p></div><div class="tools"><div class="seg"><button class="on">This month</button><button>Quarter</button><button>Year</button></div></div></div>
+      <div class="grid g4">
+        <div class="card stat"><div class="l">Total leads</div><div class="v num">47</div><div class="d up">↑ 18% vs last month</div></div>
+        <div class="card stat"><div class="l">Meetings booked</div><div class="v num">12</div><div class="d up">↑ 33% vs last month</div></div>
+        <div class="card stat"><div class="l">Proposals sent</div><div class="v num">6</div><div class="d">same as last month</div></div>
+        <div class="card stat"><div class="l">Placements</div><div class="v num">3</div><div class="d up">↑ 50% vs last month</div></div>
+      </div>
+      <div class="grid g2" style="margin-top:14px">
+        <div class="card"><div class="hd"><div><h3>Pipeline conversion</h3><p>Lead progression through each stage this month</p></div></div>
+          <div class="bd funnel" id="funnel"></div></div>
+        <div class="stack">
+          <div class="card"><div class="hd"><div><h3>Revenue</h3><p>Estimated placement fees this month</p></div></div>
+            <div class="bd"><div class="grid g3" style="gap:10px">
+              <div class="fact"><div class="l">Closed</div><div class="v num" style="font-size:18px">$87,500</div></div>
+              <div class="fact"><div class="l">Pipeline</div><div class="v num" style="font-size:18px">$142,000</div></div>
+              <div class="fact"><div class="l">Avg fee</div><div class="v num" style="font-size:18px;color:var(--good)">$29,200</div></div>
+            </div></div></div>
+          <div class="card"><div class="hd"><div><h3>Team activity</h3><p>Recruiter performance this month</p></div></div>
+            <div class="bd" style="padding-top:6px"><div class="tbl-wrap"><table><thead><tr><th>Recruiter</th><th style="text-align:right">Assigned</th><th style="text-align:right">Contacted</th><th style="text-align:right">Meetings</th></tr></thead><tbody>
+              <tr><td>James H.</td><td class="num" style="text-align:right">18</td><td class="num" style="text-align:right">14</td><td class="num" style="text-align:right">6</td></tr>
+              <tr><td>Rachel K.</td><td class="num" style="text-align:right">16</td><td class="num" style="text-align:right">10</td><td class="num" style="text-align:right">4</td></tr>
+              <tr><td>Michael T.</td><td class="num" style="text-align:right">13</td><td class="num" style="text-align:right">8</td><td class="num" style="text-align:right">2</td></tr>
+            </tbody></table></div></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SETTINGS -->
+    <section class="page" id="p-settings">
+      <div class="head"><div><h1>Settings</h1><p>Your agency, your brand on every brief, your team</p></div></div>
+      <div class="grid g2">
+        <div class="stack">
+          <div class="card"><div class="hd"><div><h3>Agency</h3><p>Shown on briefings, briefs and the portal</p></div></div>
+            <div class="bd">
+              <label class="f" for="agName">Agency name</label><input class="input" id="agName" value="Demo Agency" oninput="document.querySelector('.brand span').textContent=this.value+' · Growth+'">
+              <label class="f" style="margin-top:12px">Brief colours</label>
+              <div style="display:flex;gap:18px;flex-wrap:wrap;font-size:13px;align-items:center"><span><i class="sw" style="background:#0D1626"></i>Primary <span class="mono" style="color:var(--ink-3)">#0D1626</span></span><span><i class="sw" style="background:#0B7A75"></i>Accent <span class="mono" style="color:var(--ink-3)">#0B7A75</span></span></div>
+            </div></div>
+          <div class="card"><div class="hd"><div><h3>Contact card</h3><p>Appears on page 2 of every industry brief</p></div></div>
+            <div class="bd"><div class="grid g2" style="gap:12px"><div><label class="f">Your name</label><input class="input" value="Demo User"></div><div><label class="f">Title</label><input class="input" value="Recruitment Director"></div><div><label class="f">Email</label><input class="input" value="demo@agency.com"></div><div><label class="f">Phone</label><input class="input" value="+1 416 555 0142"></div></div></div></div>
+        </div>
+        <div class="stack">
+          <div class="card"><div class="hd"><div><h3>Team</h3><p>Recruiters get their morning leads; the owner sees the whole picture</p></div><button class="btn sm" onclick="toast('Invite sent')">Invite</button></div>
+            <div class="bd">
+              <div class="member"><span class="av">DU</span><div><div class="n">Demo User</div><div class="e">demo@agency.com</div></div><span class="pill grey role">Owner</span></div>
+              <div class="member"><span class="av">JH</span><div><div class="n">James H.</div><div class="e">james@agency.com</div></div><span class="pill grey role">Recruiter</span></div>
+              <div class="member"><span class="av">RK</span><div><div class="n">Rachel K.</div><div class="e">rachel@agency.com</div></div><span class="pill grey role">Recruiter</span></div>
+              <div class="member"><span class="av">MT</span><div><div class="n">Michael T.</div><div class="e">michael@agency.com</div></div><span class="pill grey role">Recruiter</span></div>
+            </div></div>
+          <div class="card"><div class="hd"><div><h3>Plan</h3><p>Growth+ · renews Oct 14</p></div><span class="pill new">Active</span></div>
+            <div class="bd"><div class="grid g3" style="gap:10px"><div class="fact"><div class="l">Roles</div><div class="v">12</div></div><div class="fact"><div class="l">Locations</div><div class="v">3</div></div><div class="fact"><div class="l">Briefs / mo</div><div class="v">Unlimited</div></div></div>
+              <p style="font-size:12.5px;color:var(--ink-3);margin-top:12px">Daily digest, lead reports, industry briefs, white-label PDFs, up to 5 seats.</p></div></div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<nav class="tabbar" id="tabbar">
+  <button data-p="briefing" onclick="go('briefing')"><svg class="i" viewBox="0 0 24 24"><path d="M3 11l9-7 9 7v9a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1z"/></svg>Briefing</button>
+  <button data-p="pipeline" onclick="go('pipeline')"><svg class="i" viewBox="0 0 24 24"><path d="M4 6h16M4 12h10M4 18h6"/></svg>Pipeline</button>
+  <button data-p="intel" onclick="go('intel')"><svg class="i" viewBox="0 0 24 24"><path d="M3 20h18M6 16V9M11 16V5M16 16v-7M21 16v-4"/></svg>Intel</button>
+  <button data-p="engine" onclick="go('engine')"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4M5 5l2.8 2.8M16.2 16.2L19 19M5 19l2.8-2.8M16.2 7.8L19 5"/></svg>Engine</button>
+  <button data-p="roles" onclick="go('roles')"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>Roles</button>
+  <button data-p="analytics" onclick="go('analytics')"><svg class="i" viewBox="0 0 24 24"><path d="M4 19V5M4 19h16M8 15l4-5 3 3 5-7"/></svg>Analytics</button>
+  <button data-p="settings" onclick="go('settings')"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg>Settings</button>
+</nav>
+
+<div class="scrim" id="scrim" onclick="closeDrawer()"></div>
+<aside class="drawer" id="drawer" aria-hidden="true"><div id="drawerBody"></div></aside>
+<div class="toast" id="toast"></div>
+
+<script src="/data/kurrent-data.js"></script>
+<script src="/src/kurrent.js"></script>
+</body>
+</html>
